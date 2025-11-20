@@ -376,11 +376,19 @@ const Exporter = {
     toPDF(elementId, filename) {
         const element = document.getElementById(elementId);
         const opt = {
-            margin: [10, 10, 10, 10],
+            margin: [5, 5, 5, 5],
             filename: filename,
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            html2canvas: {
+                scale: 2,
+                useCORS: true,
+                scrollY: 0,
+                scrollX: 0,
+                windowWidth: element.scrollWidth,
+                windowHeight: element.scrollHeight
+            },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
 
         const btn = document.querySelector('.btn-primary');

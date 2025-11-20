@@ -365,7 +365,7 @@ body {
     background: white;
     width: 210mm;
     min-height: 297mm;
-    overflow-y: scroll;
+    overflow-y: visible;
     padding: 0;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     color: #000;
