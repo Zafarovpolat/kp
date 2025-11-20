@@ -244,7 +244,6 @@ body {
     margin-bottom: 1.5rem;
     position: sticky;
     top: 0;
-    transform: translateY(-20px);
     z-index: 10;
     background: rgba(30, 30, 30, 0.9);
     padding: 10px;
@@ -364,16 +363,13 @@ body {
 .preview-paper {
     background: white;
     width: 210mm;
-    min-height: 297mm;
-    overflow-y: visible;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    overflow-x: hidden;
     padding: 0;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     color: #000;
-    transform-origin: top center;
-    transform: scale(0.8);
     margin-bottom: 2rem;
-    /* Fix for transform creating whitespace */
-    margin-top: -30px;
 }
 
 /* Scrollbar */
@@ -442,12 +438,7 @@ body {
     }
 
     .preview-paper {
-        transform: scale(0.7);
-        margin-top: -50px;
-    }
-
-    .toolbar {
-        transform: translateY(-30px);
+        max-height: calc(100vh - 180px);
     }
 }
 
@@ -485,8 +476,7 @@ body {
     }
 
     .preview-paper {
-        transform: scale(0.6);
-        margin-top: -80px;
+        max-height: calc(100vh - 160px);
     }
 }
 
@@ -512,9 +502,8 @@ body {
     }
 
     .preview-paper {
-        transform: scale(0.5);
-        transform-origin: top center;
-        margin-top: 0;
+        width: 100%;
+        max-height: calc(100vh - 140px);
     }
 }
 

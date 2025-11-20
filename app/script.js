@@ -376,7 +376,7 @@ const Exporter = {
     toPDF(elementId, filename) {
         const element = document.getElementById(elementId);
         const opt = {
-            margin: [5, 5, 5, 5],
+            margin: 0,
             filename: filename,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: {
@@ -384,11 +384,13 @@ const Exporter = {
                 useCORS: true,
                 scrollY: 0,
                 scrollX: 0,
+                width: element.scrollWidth,
+                height: element.scrollHeight,
                 windowWidth: element.scrollWidth,
                 windowHeight: element.scrollHeight
             },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            pagebreak: { mode: 'avoid-all', avoid: '.preview-paper' }
         };
 
         const btn = document.querySelector('.btn-primary');
