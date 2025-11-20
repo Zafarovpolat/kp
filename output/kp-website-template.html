@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"
+    xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="ProgId" content="Word.Document">
+    <meta name="Generator" content="Microsoft Word 15">
+    <meta name="Originator" content="Microsoft Word 15">
+    <title>Коммерческое предложение - Корпоративный сайт</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>100</w:Zoom>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm 2cm 2cm 2cm;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #333333;
+            max-width: 21cm;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 24pt;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 30px 0 10px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #0066cc;
+        }
+
+        h2 {
+            font-size: 18pt;
+            font-weight: 600;
+            color: #0066cc;
+            margin: 25px 0 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        h3 {
+            font-size: 14pt;
+            font-weight: 600;
+            color: #333333;
+            margin: 20px 0 10px 0;
+        }
+
+        .title-page {
+            text-align: center;
+            padding: 100px 0 50px 0;
+            page-break-after: always;
+        }
+
+        .title-page h1 {
+            font-size: 32pt;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .title-page .company-name {
+            font-size: 20pt;
+            font-weight: 600;
+            color: #0066cc;
+            margin: 20px 0;
+        }
+
+        .title-page .tagline {
+            font-size: 14pt;
+            color: #666666;
+            font-style: italic;
+            margin: 30px 0;
+        }
+
+        .section {
+            margin: 30px 0;
+            page-break-inside: avoid;
+        }
+
+        .highlight-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #0066cc;
+            padding: 15px 20px;
+            margin: 15px 0;
+        }
+
+        .info-grid {
+            display: table;
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .info-row {
+            display: table-row;
+        }
+
+        .info-label {
+            display: table-cell;
+            font-weight: 600;
+            width: 35%;
+            padding: 8px 10px 8px 0;
+            vertical-align: top;
+        }
+
+        .info-value {
+            display: table-cell;
+            padding: 8px 0;
+            vertical-align: top;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th {
+            background-color: #0066cc;
+            color: white;
+            font-weight: 600;
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #0066cc;
+        }
+
+        td {
+            padding: 10px 12px;
+            border: 1px solid #cccccc;
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .total-row {
+            font-weight: 700;
+            background-color: #e6f2ff !important;
+            font-size: 12pt;
+        }
+
+        .tech-badge {
+            display: inline-block;
+            background-color: #e6f2ff;
+            color: #0066cc;
+            padding: 5px 12px;
+            margin: 5px 5px 5px 0;
+            border-radius: 15px;
+            font-size: 10pt;
+            font-weight: 600;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        ul li:before {
+            content: "✓";
+            color: #00cc66;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            font-size: 14pt;
+        }
+
+        .steps ol {
+            counter-reset: step-counter;
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .steps ol li {
+            counter-increment: step-counter;
+            padding: 15px 0 15px 50px;
+            position: relative;
+            border-left: 2px solid #e0e0e0;
+        }
+
+        .steps ol li:before {
+            content: counter(step-counter);
+            position: absolute;
+            left: -15px;
+            top: 15px;
+            background-color: #0066cc;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+        }
+
+        .steps ol li strong {
+            display: block;
+            font-size: 12pt;
+            color: #0066cc;
+            margin-bottom: 5px;
+        }
+
+        .contact-info {
+            background-color: #f0f7ff;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .contact-info p {
+            margin: 8px 0;
+            font-size: 11pt;
+        }
+
+        .placeholder {
+            background-color: #fff3cd;
+            color: #856404;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .note {
+            font-size: 10pt;
+            color: #666666;
+            font-style: italic;
+            margin: 10px 0;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ТИТУЛЬНАЯ СТРАНИЦА -->
+    <div class="title-page">
+        <h1>КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ</h1>
+        <p style="font-size: 16pt; margin: 20px 0;">на разработку корпоративного сайта</p>
+
+        <div class="company-name">
+            для компании <span class="placeholder">[НАЗВАНИЕ КОМПАНИИ КЛИЕНТА]</span>
+        </div>
+
+        <div class="tagline">Сайты, которые продают</div>
+
+        <p class="note" style="margin-top: 80px; font-size: 10pt;">
+            Дата: <span class="placeholder">[ДАТА]</span><br>
+            Действительно до: <span class="placeholder">[ДАТА + 10 ДНЕЙ]</span>
+        </p>
+    </div>
+
+    <!-- ПОНИМАНИЕ ЗАДАЧИ -->
+    <div class="section">
+        <h2>ПОНИМАНИЕ ЗАДАЧИ</h2>
+
+        <div class="info-grid">
+            <div class="info-row">
+                <div class="info-label">Компания:</div>
+                <div class="info-value"><span class="placeholder">[НАЗВАНИЕ КОМПАНИИ]</span></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Сфера деятельности:</div>
+                <div class="info-value"><span class="placeholder">[СФЕРА]</span></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Тип сайта:</div>
+                <div class="info-value"><span class="placeholder">[Landing Page / Многостраничный сайт /
+                        Интернет-магазин]</span></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Основная цель:</div>
+                <div class="info-value"><span class="placeholder">[ЦЕЛЬ: например, "Генерация заявок", "Презентация
+                        услуг", "Продажи"]</span></div>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <h3 style="margin-top: 0;">Задача проекта:</h3>
+            <p>Создать современный сайт, который:</p>
+            <ul>
+                <li>Конвертирует посетителей в клиентов</li>
+                <li>Корректно отображается на всех устройствах (Mobile First)</li>
+                <li>Легко управляется без программистов</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- НАШЕ РЕШЕНИЕ -->
+    <div class="section">
+        <h2>НАШЕ РЕШЕНИЕ</h2>
+
+        <h3>Технологический стек:</h3>
+
+        <div style="margin: 15px 0;">
+            <span class="tech-badge">🎨 Figma</span>
+            <span class="tech-badge">💻 HTML5 / CSS3 / JS</span>
+            <span class="tech-badge">🔧 <span class="placeholder">[WordPress / Битрикс / Tilda]</span></span>
+            <span class="tech-badge">📱 Mobile First</span>
+            <span class="tech-badge">🔍 SEO</span>
+        </div>
+
+        <h3 style="margin-top: 25px;">Подход к разработке:</h3>
+
+        <div style="margin: 20px 0;">
+            <p><strong style="color: #0066cc;">✓ UX-first</strong><br>
+                Структура сайта строится от потребностей пользователя</p>
+
+            <p><strong style="color: #0066cc;">✓ Mobile First</strong><br>
+                70% трафика идет с телефонов — начинаем проектировать с мобильной версии</p>
+
+            <p><strong style="color: #0066cc;">✓ Конверсионность</strong><br>
+                Каждый блок работает на бизнес-цель (формы, кнопки, триггеры доверия)</p>
+        </div>
+    </div>
+
+    <!-- ЭТАПЫ РАБОТ -->
+    <div class="section page-break">
+        <h2>ЭТАПЫ РАБОТ</h2>
+
+        <div class="steps">
+            <ol>
+                <li>
+                    <strong>Прототипирование и ТЗ (5-7 дней)</strong>
+                    <ul style="margin-top: 5px;">
+                        <li>Бриф и созвон с заказчиком</li>
+                        <li>Анализ конкурентов (10-15 сайтов)</li>
+                        <li>Структура сайта (sitemap)</li>
+                        <li>Интерактивный прототип (кликабельный макет)</li>
+                    </ul>
+                </li>
+
+                <li>
+                    <strong>Дизайн (10-14 дней)</strong>
+                    <ul>
+                        <li>Дизайн-концепция главной страницы (2 варианта на выбор)</li>
+                        <li>Дизайн всех внутренних страниц</li>
+                        <li>UI-kit (кнопки, формы, иконки)</li>
+                        <li>2 раунда правок</li>
+                    </ul>
+                </li>
+
+                <li>
+                    <strong>Верстка (7-10 дней)</strong>
+                    <ul>
+                        <li>Адаптивная кроссбраузерная верстка</li>
+                        <li>Анимации и микроинтеракции</li>
+                        <li>Интеграция форм обратной связи</li>
+                    </ul>
+                </li>
+
+                <li>
+                    <strong>Программирование (10-12 дней)</strong>
+                    <ul>
+                        <li>Установка CMS</li>
+                        <li>Наполнение контентом (до 10 страниц)</li>
+                        <li>Интеграция с системами аналитики (Google Analytics, Яндекс.Метрика)</li>
+                        <li>Тестирование на всех устройствах</li>
+                    </ul>
+                </li>
+
+                <li>
+                    <strong>Запуск и поддержка (2-3 дня)</strong>
+                    <ul>
+                        <li>Размещение на хостинге</li>
+                        <li>Настройка SSL-сертификата</li>
+                        <li>Инструкция по работе с CMS</li>
+                        <li>30 дней бесплатной техподдержки</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- СМЕТА И СРОКИ -->
+    <div class="section">
+        <h2>СМЕТА И СРОКИ</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 22%;">Этап работ</th>
+                    <th style="width: 38%;">Состав работ</th>
+                    <th style="width: 15%;">Сроки</th>
+                    <th style="width: 25%;">Стоимость</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>1. Прототип + ТЗ</strong></td>
+                    <td>Бриф, анализ, структура, wireframes</td>
+                    <td>5-7 дн.</td>
+                    <td><span class="placeholder">[ЦЕНА]</span> ₽</td>
+                </tr>
+                <tr>
+                    <td><strong>2. Дизайн</strong></td>
+                    <td>2 концепции + UI-kit + правки</td>
+                    <td>10-14 дн.</td>
+                    <td><span class="placeholder">[ЦЕНА]</span> ₽</td>
+                </tr>
+                <tr>
+                    <td><strong>3. Верстка</strong></td>
+                    <td>Responsive, анимации, формы</td>
+                    <td>7-10 дн.</td>
+                    <td><span class="placeholder">[ЦЕНА]</span> ₽</td>
+                </tr>
+                <tr>
+                    <td><strong>4. Программирование</strong></td>
+                    <td>CMS, наполнение, аналитика</td>
+                    <td>10-12 дн.</td>
+                    <td><span class="placeholder">[ЦЕНА]</span> ₽</td>
+                </tr>
+                <tr>
+                    <td><strong>5. Запуск</strong></td>
+                    <td>Хостинг, SSL, обучение</td>
+                    <td>2-3 дн.</td>
+                    <td><span class="placeholder">[ЦЕНА]</span> ₽</td>
+                </tr>
+                <tr class="total-row">
+                    <td colspan="2"><strong>ИТОГО:</strong> Сайт "под ключ"</td>
+                    <td><strong>35-45 дн.</strong></td>
+                    <td><strong><span class="placeholder">[ИТОГО]</span> ₽</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="highlight-box">
+            <h3 style="margin-top: 0;">Дополнительно (опционально):</h3>
+            <div class="info-grid">
+                <div class="info-row">
+                    <div class="info-label">Копирайтинг:</div>
+                    <div class="info-value">от <span class="placeholder">[ЦЕНА]</span> ₽ за страницу</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">SEO-продвижение:</div>
+                    <div class="info-value">от <span class="placeholder">[ЦЕНА]</span> ₽/мес.</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Фотосессия:</div>
+                    <div class="info-value">от <span class="placeholder">[ЦЕНА]</span> ₽</div>
+                </div>
+            </div>
+        </div>
+
+        <p class="note">* Цена действительна 10 календарных дней с даты предложения.</p>
+    </div>
+
+    <!-- ПОЧЕМУ МЫ -->
+    <div class="section page-break">
+        <h2>ПОЧЕМУ МЫ</h2>
+
+        <ul style="font-size: 11pt;">
+            <li><strong>Гарантия сроков</strong> — фиксируем дедлайны в договоре, пени за просрочку</li>
+            <li><strong>Поэтапная оплата</strong> — платите только за выполненные этапы</li>
+            <li><strong>Прозрачность</strong> — доступ к Figma и тестовому серверу на всех этапах</li>
+            <li><strong>Техподдержка</strong> — 30 дней бесплатно после запуска</li>
+            <li><strong>Обучение</strong> — видеоинструкция по работе с сайтом</li>
+        </ul>
+    </div>
+
+    <!-- ПОРТФОЛИО -->
+    <div class="section">
+        <h2>ПОРТФОЛИО</h2>
+
+        <div class="highlight-box">
+            <p><strong>Вставить 3 кейса сайтов из релевантной ниши</strong></p>
+            <p>Формат для каждого кейса:</p>
+            <ul>
+                <li>Скриншот главной страницы</li>
+                <li>Название компании + сфера</li>
+                <li>Результат (например: "Конверсия в заявку выросла с 2% до 7%")</li>
+            </ul>
+        </div>
+
+        <p style="margin-top: 20px;"><span class="placeholder">[ВСТАВИТЬ ИЗОБРАЖЕНИЯ КЕЙСОВ]</span></p>
+    </div>
+
+    <!-- СЛЕДУЮЩИЕ ШАГИ -->
+    <div class="section">
+        <h2>СЛЕДУЮЩИЕ ШАГИ</h2>
+
+        <h3>Давайте начнем?</h3>
+
+        <ol style="list-style: decimal; padding-left: 20px; line-height: 2;">
+            <li>Отправьте нам заполненный бриф (ссылка)</li>
+            <li>Созвонимся для обсуждения деталей (30 мин.)</li>
+            <li>Подготовим договор и стартуем</li>
+        </ol>
+
+        <div class="contact-info">
+            <h3 style="margin-top: 0; color: #0066cc;">Контакты:</h3>
+            <p><strong>Менеджер проекта:</strong> <span class="placeholder">[ИМЯ МЕНЕДЖЕРА]</span></p>
+            <p><strong>Телефон:</strong> <span class="placeholder">[ТЕЛЕФОН]</span></p>
+            <p><strong>Email:</strong> <span class="placeholder">[EMAIL]</span></p>
+            <p><strong>Telegram:</strong> <span class="placeholder">[@USERNAME]</span></p>
+            <p class="note" style="margin-top: 15px;">Мы на связи ежедневно с 10:00 до 19:00 (МСК)</p>
+        </div>
+    </div>
+
+</body>
+
+</html>
