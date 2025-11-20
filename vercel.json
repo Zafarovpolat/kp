@@ -1,8 +1,18 @@
 {
   "rewrites": [
     {
+      "source": "/",
+      "destination": "/app/index.html"
+    },
+    {
       "source": "/api/chat",
       "destination": "/api/proxy.py"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/app/(.*)",
+      "dest": "/app/$1"
     }
   ],
   "headers": [
