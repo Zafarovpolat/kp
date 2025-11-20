@@ -5,6 +5,18 @@
       "destination": "/app/index.html"
     },
     {
+      "source": "/generator.html",
+      "destination": "/app/generator.html"
+    },
+    {
+      "source": "/styles.css",
+      "destination": "/app/styles.css"
+    },
+    {
+      "source": "/script.js",
+      "destination": "/app/script.js"
+    },
+    {
       "source": "/api/chat",
       "destination": "/api/proxy.py"
     }
