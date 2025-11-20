@@ -9,12 +9,6 @@
       "destination": "/api/proxy.py"
     }
   ],
-  "routes": [
-    {
-      "src": "/app/(.*)",
-      "dest": "/app/$1"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
