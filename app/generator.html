@@ -22,15 +22,15 @@
             <nav class="nav-menu">
                 <a href="/" class="nav-item">
                     <i class="fa-solid fa-grid-2"></i>
-                    Дашборд
+                    <span>Дашборд</span>
                 </a>
                 <a href="#" class="nav-item active">
                     <i class="fa-solid fa-pen-to-square"></i>
-                    Редактор
+                    <span>Редактор</span>
                 </a>
                 <a href="#" class="nav-item">
                     <i class="fa-solid fa-folder-open"></i>
-                    Мои проекты
+                    <span>Мои проекты</span>
                 </a>
             </nav>
 
@@ -44,7 +44,7 @@
             <div class="top-bar">
                 <div class="page-title">Редактор КП</div>
                 <div class="actions">
-                    <a href="/" class="btn btn-outline" style="padding: 0.5rem 1rem; font-size: 0.8rem;">
+                    <a href="/" class="btn btn-outline btn-sm">
                         <i class="fa-solid fa-arrow-left"></i> Назад
                     </a>
                 </div>
@@ -53,7 +53,7 @@
             <div class="generator-layout">
                 <!-- Left Panel: Form -->
                 <div class="form-panel">
-                    <div style="margin-bottom: 2rem;">
+                    <div class="panel-header" style="margin-bottom: 2rem;">
                         <h2 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Данные проекта</h2>
                         <p style="color: var(--text-secondary); font-size: 0.9rem;">Заполните форму или используйте AI
                         </p>
@@ -63,7 +63,8 @@
                         <!-- Fields will be injected here by script.js -->
                     </form>
 
-                    <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                    <div class="form-actions"
+                        style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
                         <button id="btnClear" class="btn btn-outline" style="width: 100%;">
                             <i class="fa-solid fa-trash"></i> Очистить форму
                         </button>
@@ -73,10 +74,7 @@
                 <!-- Right Panel: Preview -->
                 <div class="preview-panel">
                     <div class="toolbar">
-                        <button id="btnDownload" class="btn btn-primary">
-                            <i class="fa-solid fa-file-pdf"></i> Скачать PDF
-                        </button>
-                        <button id="btnPrint" class="btn btn-secondary">
+                        <button id="btnPrint" class="btn btn-primary">
                             <i class="fa-solid fa-print"></i> Печать
                         </button>
                     </div>
