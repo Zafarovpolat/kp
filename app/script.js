@@ -1,17 +1,17 @@
 // ============================================================
-// KP GENERATOR - Main Script V2 (AI Generates Full Detailed КП)
+// KP GENERATOR - Main Script V2.1 (Google Gemini 2.0 Flash)
 // ============================================================
 
 /* ============================================================
-   AI HELPER - Generates DETAILED FULL KP Document
+   AI HELPER - Google Gemini 2.0 Flash
    ============================================================ */
 const AIHelper = {
-    apiKey: 'sk-ai-v1-2cf03b8d30e1b2672de17174830929e852b057b8609b972a8faa4ae871dab488',
-    // Автоопределение URL: на продакшене используем относительный путь, локально - localhost:8080
+    // Автоопределение URL: localhost → Flask proxy, production → Vercel serverless
     apiUrl: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:8080/api/chat'
-        : '/api/chat',  // На Vercel будет работать serverless function
-    model: 'google/gemini-3-pro-preview-free',
+        : '/api/chat',
+
+    model: 'gemini-2.0-flash',
 
     // AI Generated КП data stored here
     currentAIKP: null,
@@ -20,54 +20,54 @@ const AIHelper = {
         const prompt = this.constructDetailedPrompt(type, formData);
 
         try {
+            console.log(`[AI] Sending request to: ${this.apiUrl}`);
+            console.log(`[AI] Model: ${this.model}`);
+
             const response = await fetch(this.apiUrl, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.apiKey}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    model: this.model,
-                    messages: [
-                        {
-                            role: "system",
-                            content: "Ты — профессиональный арт-директор и копирайтер в топовом дизайн-агентстве. Твоя задача — создать МАКСИМАЛЬНО ПОДРОБНОЕ и профессиональное коммерческое предложение на основе кратких данных клиента. КП должно быть объёмным, на 3-5 страниц, с детальным описанием каждого этапа работы. Ответ должен быть в формате JSON."
-                        },
-                        {
-                            role: "user",
-                            content: prompt
-                        }
-                    ],
+                    prompt: prompt,
+                    max_tokens: 8192,
+                    temperature: 0.7,
                     response_format: { type: "json_object" }
                 })
             });
 
             if (!response.ok) {
-                throw new Error(`API Error: ${response.status}`);
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || `API Error: ${response.status}`);
             }
 
             const data = await response.json();
             let contentStr = data.choices[0].message.content;
 
-            // Очистка от markdown блоков
-            contentStr = contentStr.replace(/```json/g, '').replace(/```/g, '').trim();
+            // Очистка от markdown блоков если есть
+            contentStr = contentStr.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
 
-            console.log('AI Response:', contentStr);
+            console.log('[AI] Response received, length:', contentStr.length);
 
             const content = JSON.parse(contentStr);
             this.currentAIKP = content;
             return content;
 
         } catch (error) {
-            console.error('AI Generation failed:', error);
-            alert('Ошибка генерации AI: ' + error.message);
-            return null;
+            console.error('[AI] Generation failed:', error);
+            throw error;
         }
     },
 
     constructDetailedPrompt(type, data) {
+        const systemPrompt = `Ты — профессиональный арт-директор и копирайтер в топовом дизайн-агентстве. 
+Твоя задача — создать МАКСИМАЛЬНО ПОДРОБНОЕ и профессиональное коммерческое предложение на основе кратких данных клиента. 
+КП должно быть объёмным, на 3-5 страниц, с детальным описанием каждого этапа работы.
+Ответ должен быть ТОЛЬКО в формате JSON без дополнительного текста.`;
+
         if (type === 'logo') {
-            return `
+            return `${systemPrompt}
+
 Создай детальное коммерческое предложение для разработки логотипа и фирменного стиля.
 
 ИСХОДНЫЕ ДАННЫЕ:
@@ -75,7 +75,7 @@ const AIHelper = {
 - Сфера: ${data['client-industry'] || 'Не указано'}
 - Бюджет: ${data['price-total'] || '150000'} руб.
 
-СТРУКТУРА JSON (ответь ТОЛЬКО JSON):
+ОБЯЗАТЕЛЬНАЯ СТРУКТУРА JSON:
 {
     "understanding": "Детальный раздел 'Понимание задачи' - 2-3 абзаца о компании, её сфере, целевой аудитории, важности айдентики в их отрасли",
     "solution": "Раздел 'Наше решение' - 3-4 абзаца о подходе агентства, уникальности методологии, почему это сработает для клиента",
@@ -83,78 +83,81 @@ const AIHelper = {
         {
             "number": "01",
             "title": "Исследование и Аналитика",
-            "description": "3-5 абзацев ДЕТАЛЬНОГО описания",
+            "description": "3-5 абзацев ДЕТАЛЬНОГО описания этапа",
             "deliverables": ["Аналитический отчет", "Конкурентный анализ", "Moodboard"]
         },
         {
             "number": "02",
             "title": "Разработка Логотипа",
-            "description": "3-5 абзацев",
+            "description": "3-5 абзацев детального описания",
             "deliverables": ["3 концепции лого", "Финальный логотип в векторе"]
         },
         {
             "number": "03",
             "title": "Фирменный Стиль",
-            "description": "3-5 абзацев",
-            "deliverables": ["Цвета", "Шрифты", "Паттерны", "Дизайн носителей"]
+            "description": "3-5 абзацев детального описания",
+            "deliverables": ["Цветовая палитра", "Типографика", "Паттерны", "Дизайн носителей"]
         },
         {
             "number": "04",
             "title": "Брендбук",
-            "description": "2-3 абзаца",
-            "deliverables": ["Брендбук PDF", "Шаблоны"]
+            "description": "2-3 абзаца описания",
+            "deliverables": ["Брендбук PDF", "Исходники", "Шаблоны"]
         }
     ],
-    "why_us": ["Пункт 1", "Пункт 2", "Пункт 3", "Пункт 4"],
-    "guarantee": "Параграф о гарантиях"
+    "why_us": ["Причина 1 - почему выбрать нас", "Причина 2", "Причина 3", "Причина 4"],
+    "guarantee": "Развёрнутый параграф о гарантиях качества и поддержке"
 }`;
         } else if (type === 'website') {
-            return `
+            return `${systemPrompt}
+
 Создай детальное коммерческое предложение для разработки корпоративного сайта.
 
 ИСХОДНЫЕ ДАННЫЕ:
 - Клиент: ${data['client-name'] || 'Не указано'}
 - Сфера: ${data['client-industry'] || 'Не указано'}
 - Тип сайта: ${data['site-type'] || 'Корпоративный'}
-- Цель: ${data['site-goal'] || 'Продажи'}
+- Цель: ${data['site-goal'] || 'Привлечение клиентов'}
 - Бюджет: ${data['price-total'] || '250000'} руб.
 
-СТРУКТУРА JSON:
+ОБЯЗАТЕЛЬНАЯ СТРУКТУРА JSON:
 {
-    "understanding": "2-3 абзаца о бизнесе клиента",
-    "solution": "3-4 абзаца о технологиях (React/Next), UX, Mobile First",
+    "understanding": "2-3 абзаца о бизнесе клиента и его потребностях в сайте",
+    "solution": "3-4 абзаца о технологиях (React/Next.js), UX-подходе, Mobile First стратегии",
     "stages": [
         {
             "number": "01",
             "title": "Прототипирование и UX",
-            "description": "4-5 абзацев",
-            "deliverables": ["UX-исследование", "Wireframes", "Прототип"]
+            "description": "4-5 абзацев детального описания",
+            "deliverables": ["UX-исследование", "Wireframes", "Интерактивный прототип"]
         },
         {
             "number": "02",
             "title": "UI Дизайн",
-            "description": "4-5 абзацев",
-            "deliverables": ["Дизайн-концепция", "Макеты", "UI Kit"]
+            "description": "4-5 абзацев детального описания",
+            "deliverables": ["Дизайн-концепция", "Макеты всех страниц", "UI Kit"]
         },
         {
             "number": "03",
-            "title": "Разработка",
-            "description": "4-5 абзацев",
-            "deliverables": ["Frontend", "Backend", "CMS"]
+            "title": "Frontend и Backend разработка",
+            "description": "4-5 абзацев детального описания",
+            "deliverables": ["Адаптивная вёрстка", "Программирование", "CMS интеграция"]
         },
         {
             "number": "04",
             "title": "Тестирование и Запуск",
-            "description": "2-3 абзаца",
-            "deliverables": ["Оптимизация", "SEO", "Обучение"]
+            "description": "2-3 абзаца описания",
+            "deliverables": ["QA тестирование", "SEO оптимизация", "Деплой", "Обучение"]
         }
     ],
-    "why_us": ["Опыт 50+ проектов", "Современный стек", "Гарантия", "Поддержка"],
-    "guarantee": "Параграф о гарантиях"
+    "why_us": ["Опыт 50+ проектов", "Современный стек технологий", "Гарантия 12 месяцев", "Техподдержка"],
+    "guarantee": "Развёрнутый параграф о гарантиях"
 }`;
         } else {
-            return `
-Создай детальное ЭКСПРЕСС коммерческое предложение.
+            // Express
+            return `${systemPrompt}
+
+Создай детальное ЭКСПРЕСС коммерческое предложение (компактное, но информативное).
 
 ИСХОДНЫЕ ДАННЫЕ:
 - Клиент: ${data['client-name'] || 'Не указано'}
@@ -162,13 +165,13 @@ const AIHelper = {
 - Срок: ${data['duration'] || '5'} дней
 - Бюджет: ${data['price-total'] || '50000'} руб.
 
-СТРУКТУРА JSON:
+ОБЯЗАТЕЛЬНАЯ СТРУКТУРА JSON:
 {
-    "intro": "2-3 предложения",
-    "what_included": "Детальный список (5-7 пунктов) что входит",
-    "results": ["Результат 1", "Результат 2", "Результат 3", "Результат 4"],
-    "timeline": "Параграф о сроках",
-    "guarantee": "Гарантии"
+    "intro": "2-3 предложения - яркое вступление о проекте",
+    "what_included": "Детальное описание того, что входит в работу (5-7 пунктов списком через запятую или развёрнутый текст)",
+    "results": ["Конкретный результат 1", "Конкретный результат 2", "Конкретный результат 3", "Конкретный результат 4"],
+    "timeline": "Параграф о сроках выполнения и этапах",
+    "guarantee": "Информация о гарантиях качества"
 }`;
         }
     }
@@ -182,7 +185,7 @@ const TEMPLATES = {
         title: "Логотип и Фирменный стиль",
         fields: [
             { id: "client-name", label: "Название компании клиента", type: "text", placeholder: "ООО Ромашка", required: true },
-            { id: "client-industry", label: "Сфера деятельности", type: "text", placeholder: "Строительство, IT...", required: true },
+            { id: "client-industry", label: "Сфера деятельности", type: "text", placeholder: "Строительство, IT, Медицина...", required: true },
             { id: "price-total", label: "Общая стоимость (₽)", type: "number", placeholder: "150000", required: true },
             { id: "manager-name", label: "Имя менеджера", type: "text", placeholder: "Иван Иванов", required: true },
             { id: "manager-phone", label: "Телефон", type: "tel", placeholder: "+7 (999) 000-00-00", required: true },
@@ -193,9 +196,9 @@ const TEMPLATES = {
         title: "Корпоративный сайт",
         fields: [
             { id: "client-name", label: "Название компании клиента", type: "text", placeholder: "ООО Ромашка", required: true },
-            { id: "client-industry", label: "Сфера деятельности", type: "text", placeholder: "Строительство, IT...", required: true },
+            { id: "client-industry", label: "Сфера деятельности", type: "text", placeholder: "Строительство, IT, Медицина...", required: true },
             { id: "site-type", label: "Тип сайта", type: "select", options: ["Landing Page", "Корпоративный сайт", "Интернет-магазин", "Промо-сайт"] },
-            { id: "site-goal", label: "Цель сайта", type: "text", placeholder: "Привлечение клиентов..." },
+            { id: "site-goal", label: "Цель сайта", type: "text", placeholder: "Привлечение клиентов, продажи..." },
             { id: "price-total", label: "Общая стоимость (₽)", type: "number", placeholder: "250000", required: true },
             { id: "manager-name", label: "Имя менеджера", type: "text", placeholder: "Иван Иванов", required: true },
             { id: "manager-phone", label: "Телефон", type: "tel", placeholder: "+7 (999) 000-00-00", required: true },
@@ -205,7 +208,7 @@ const TEMPLATES = {
     express: {
         title: "Экспресс-КП",
         fields: [
-            { id: "service-type", label: "Тип услуги", type: "text", placeholder: "Логотип / Сайт", required: true },
+            { id: "service-type", label: "Тип услуги", type: "text", placeholder: "Логотип / Сайт / Дизайн", required: true },
             { id: "client-name", label: "Название компании", type: "text", placeholder: "ООО Ромашка", required: true },
             { id: "service-name", label: "Что разрабатываем", type: "text", placeholder: "Разработка логотипа", required: true },
             { id: "duration", label: "Срок (дней)", type: "number", placeholder: "5" },
@@ -262,7 +265,7 @@ const FormHelper = {
         // Add AI Button
         const aiBtn = document.createElement('button');
         aiBtn.className = 'btn btn-ai';
-        aiBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Генерировать КП через AI';
+        aiBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Генерировать КП через AI (Gemini 2.0)';
         aiBtn.onclick = (e) => {
             e.preventDefault();
             this.handleAIGeneration(templateKey);
@@ -349,22 +352,43 @@ const FormHelper = {
         loading.className = 'loading-overlay';
         loading.innerHTML = `
             <div class="spinner"></div>
-            <div style="color: white; font-weight: 500; margin-top: 20px;">AI создаёт детальное КП...<br><small>Это займёт 10-15 секунд</small></div>
+            <div style="color: white; font-weight: 500; margin-top: 20px;">
+                🤖 Gemini 2.0 Flash создаёт детальное КП...
+                <br><small>Это займёт 10-20 секунд</small>
+            </div>
         `;
         document.body.appendChild(loading);
 
-        // Call AI
-        const aiKP = await AIHelper.generateDetailedKP(type, formData);
+        try {
+            // Call AI
+            const aiKP = await AIHelper.generateDetailedKP(type, formData);
 
-        // Remove loading
-        document.body.removeChild(loading);
+            // Remove loading
+            document.body.removeChild(loading);
 
-        if (aiKP) {
-            // Trigger preview update
-            if (window.updatePreview) {
-                window.updatePreview();
+            if (aiKP) {
+                // Trigger preview update
+                if (window.updatePreview) {
+                    window.updatePreview();
+                }
+                alert('✨ Детальное КП успешно сгенерировано!\n\nПосмотрите в предпросмотр справа.');
             }
-            alert('✨ Детальное КП успешно сгенерировано! Посмотрите в предпросмотр справа.');
+        } catch (error) {
+            // Remove loading
+            if (document.body.contains(loading)) {
+                document.body.removeChild(loading);
+            }
+
+            // Show user-friendly error
+            let errorMessage = 'Ошибка генерации AI:\n\n';
+            if (error.message.includes('API Key')) {
+                errorMessage += '🔑 API ключ не настроен на сервере.\n\nПроверьте что:\n1. Локально: установлена переменная GEMINI_API_KEY\n2. Vercel: добавлен Environment Variable';
+            } else if (error.message.includes('timeout') || error.message.includes('Timeout')) {
+                errorMessage += '⏱️ Превышено время ожидания.\n\nПопробуйте ещё раз.';
+            } else {
+                errorMessage += error.message;
+            }
+            alert(errorMessage);
         }
     }
 };

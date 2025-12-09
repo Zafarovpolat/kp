@@ -109,16 +109,18 @@
 ```json
 {
   "rewrites": [
-    {
-      "source": "/api/chat",
-      "destination": "/api/proxy.py"
-    }
+    { "source": "/", "destination": "/app/index.html" },
+    { "source": "/generator.html", "destination": "/app/generator.html" },
+    { "source": "/styles.css", "destination": "/app/styles.css" },
+    { "source": "/script.js", "destination": "/app/script.js" },
+    { "source": "/api/chat", "destination": "/api/proxy.py" }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        {"key": "Access-Control-Allow-Origin", "value": "*"}
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" }
       ]
     }
   ]
@@ -152,12 +154,13 @@ apiUrl: window.location.hostname === 'localhost' || window.location.hostname ===
 - app/ (статические файлы)
 - api/proxy.py (serverless function)
 - vercel.json (конфигурация)
+- requirements.txt (Python зависимости)
 
 ❌ НЕ деплоится (.gitignore):
 - proxy.py (локальный Flask)
-- requirements.txt (для local dev)
 - __pycache__/
 - .vscode/
+- node_modules/
 ```
 
 ---

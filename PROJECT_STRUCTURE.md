@@ -5,6 +5,10 @@ kp/
 ├── 📄 README.md              # Основная документация
 ├── 🚀 DEPLOY.md              # Детальная инструкция по деплою
 ├── ⚡ QUICKSTART.md          # Быстрый старт деплоя (5 минут)
+├── 🗺️ ARCHITECTURE.md       # Архитектура системы
+├── 📦 PROJECT_STRUCTURE.md   # Этот файл (структура проекта)
+├── 📝 CHANGELOG.md           # История изменений
+├── 📚 INDEX.md               # Указатель документации
 ├── 🔧 vercel.json            # Конфигурация Vercel
 ├── 📝 .gitignore             # Git exclusions
 ├── 🐍 proxy.py               # Локальный Flask прокси (для разработки)
