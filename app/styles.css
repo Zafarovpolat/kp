@@ -463,7 +463,6 @@ body {
 
 /* Preview Paper */
 .preview-paper {
-    overflow-y: scroll;
     /* A4 height */
     width: 210mm;
     /* A4 width */
@@ -667,4 +666,5 @@ body {
     .preview-panel {
         padding: 1rem 0.5rem;
     }
+
 }
