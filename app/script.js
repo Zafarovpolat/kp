@@ -7,9 +7,7 @@
    ============================================================ */
 const AIHelper = {
     // Автоопределение URL: localhost → Flask proxy, production → Vercel serverless
-    apiUrl: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:8080/api/chat'
-        : '/api/chat',
+    apiUrl: '/api/chat',
 
     model: 'gemini-2.0-flash',
 
