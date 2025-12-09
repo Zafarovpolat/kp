@@ -36,13 +36,18 @@ const AIHelper = {
                 })
             });
 
+            const responseData = await response.json();
+
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || `API Error: ${response.status}`);
+                console.error('[AI] Error response:', responseData);
+                throw new Error(responseData.error || responseData.details || `API Error: ${response.status}`);
             }
 
-            const data = await response.json();
-            let contentStr = data.choices[0].message.content;
+            let contentStr = responseData.choices?.[0]?.message?.content || responseData.content || '';
+
+            if (!contentStr) {
+                throw new Error('Empty response from AI');
+            }
 
             // Очистка от markdown блоков если есть
             contentStr = contentStr.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
@@ -258,7 +263,10 @@ const FormHelper = {
         const container = document.getElementById(containerId);
         const template = TEMPLATES[templateKey];
 
-        if (!container || !template) return;
+        if (!container || !template) {
+            console.warn('[FormHelper] Container or template not found:', containerId, templateKey);
+            return;
+        }
 
         container.innerHTML = '';
 
@@ -330,6 +338,8 @@ const FormHelper = {
 
     getFormData(containerId) {
         const container = document.getElementById(containerId);
+        if (!container) return {};
+
         const inputs = container.querySelectorAll('input, select, textarea');
         const data = {};
         inputs.forEach(input => {
@@ -364,7 +374,9 @@ const FormHelper = {
             const aiKP = await AIHelper.generateDetailedKP(type, formData);
 
             // Remove loading
-            document.body.removeChild(loading);
+            if (document.body.contains(loading)) {
+                document.body.removeChild(loading);
+            }
 
             if (aiKP) {
                 // Trigger preview update
@@ -381,10 +393,12 @@ const FormHelper = {
 
             // Show user-friendly error
             let errorMessage = 'Ошибка генерации AI:\n\n';
-            if (error.message.includes('API Key')) {
-                errorMessage += '🔑 API ключ не настроен на сервере.\n\nПроверьте что:\n1. Локально: установлена переменная GEMINI_API_KEY\n2. Vercel: добавлен Environment Variable';
+            if (error.message.includes('API Key') || error.message.includes('GEMINI_API_KEY')) {
+                errorMessage += '🔑 API ключ не настроен на сервере.\n\nНа Vercel: Settings → Environment Variables → добавьте GEMINI_API_KEY';
             } else if (error.message.includes('timeout') || error.message.includes('Timeout')) {
                 errorMessage += '⏱️ Превышено время ожидания.\n\nПопробуйте ещё раз.';
+            } else if (error.message.includes('500')) {
+                errorMessage += '🔧 Ошибка сервера (500).\n\nПроверьте:\n1. GEMINI_API_KEY установлен в Vercel\n2. Ключ действителен\n3. Логи в Vercel Dashboard';
             } else {
                 errorMessage += error.message;
             }
@@ -399,6 +413,11 @@ const FormHelper = {
 const Exporter = {
     toPDF(elementId, filename) {
         const element = document.getElementById(elementId);
+        if (!element) {
+            console.error('[Exporter] Element not found:', elementId);
+            return;
+        }
+
         const opt = {
             margin: 0,
             filename: filename,
@@ -418,16 +437,22 @@ const Exporter = {
         };
 
         const btn = document.querySelector('.btn-primary');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Создание PDF...';
+        const originalText = btn ? btn.innerHTML : '';
+        if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Создание PDF...';
 
         html2pdf().set(opt).from(element).save().then(() => {
-            btn.innerHTML = originalText;
+            if (btn) btn.innerHTML = originalText;
         });
     },
 
     print(elementId) {
-        const content = document.getElementById(elementId).innerHTML;
+        const element = document.getElementById(elementId);
+        if (!element) {
+            console.error('[Exporter] Element not found:', elementId);
+            return;
+        }
+
+        const content = element.innerHTML;
         const printWindow = window.open('', '', 'height=600,width=800');
         printWindow.document.write('<html><head><title>Печать КП</title>');
         printWindow.document.write('<link rel="stylesheet" href="styles.css">');
@@ -487,39 +512,47 @@ function generateKPHTML(type, data) {
                     <h3 style="color: #2563eb; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">Этапы работ</h3>
             `;
 
-            aiKP.stages.forEach(stage => {
-                html += `
-                    <div style="margin-bottom: 30px; background: #f8fafc; padding: 20px; border-radius: 8px;">
-                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                            <div style="font-size: 28px; font-weight: bold; color: #2563eb; margin-right: 15px;">${stage.number}</div>
-                            <h4 style="margin: 0; font-size: 18px;">${stage.title}</h4>
+            if (aiKP.stages && Array.isArray(aiKP.stages)) {
+                aiKP.stages.forEach(stage => {
+                    html += `
+                        <div style="margin-bottom: 30px; background: #f8fafc; padding: 20px; border-radius: 8px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                                <div style="font-size: 28px; font-weight: bold; color: #2563eb; margin-right: 15px;">${stage.number}</div>
+                                <h4 style="margin: 0; font-size: 18px;">${stage.title}</h4>
+                            </div>
+                            <div style="color: #555; font-size: 14px; margin-bottom: 15px;">${(stage.description || '').replace(/\n/g, '<br>')}</div>
+                            <div style="border-top: 1px solid #ddd; padding-top: 10px;">
+                                <strong style="font-size: 13px; color: #666;">Результаты:</strong>
+                                <ul style="margin: 5px 0 0 20px; padding: 0;">
+                                    ${(stage.deliverables || []).map(d => `<li style="font-size: 13px; color: #555;">${d}</li>`).join('')}
+                                </ul>
+                            </div>
                         </div>
-                        <div style="color: #555; font-size: 14px; margin-bottom: 15px;">${stage.description.replace(/\n/g, '<br>')}</div>
-                        <div style="border-top: 1px solid #ddd; padding-top: 10px;">
-                            <strong style="font-size: 13px; color: #666;">Результаты:</strong>
-                            <ul style="margin: 5px 0 0 20px; padding: 0;">
-                                ${stage.deliverables.map(d => `<li style="font-size: 13px; color: #555;">${d}</li>`).join('')}
-                            </ul>
-                        </div>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            }
 
             html += `</div>`;
 
-            html += `
-                <div style="margin-bottom: 40px;">
-                    <h3 style="color: #2563eb; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">Почему мы</h3>
-                    <ul style="list-style: none; padding: 0;">
-                        ${aiKP.why_us.map(reason => `<li style="margin-bottom: 10px; padding-left: 25px; position: relative;"><span style="position: absolute; left: 0; color: #2563eb; font-size: 18px;">✓</span>${reason}</li>`).join('')}
-                    </ul>
-                </div>
-                
-                <div style="margin-bottom: 40px; background: #f0f9ff; padding: 20px; border-radius: 8px; border-left: 4px solid #2563eb;">
-                    <strong style="color: #2563eb;">Гарантии:</strong>
-                    <div style="margin-top: 10px; color: #555;">${aiKP.guarantee}</div>
-                </div>
-            `;
+            if (aiKP.why_us && Array.isArray(aiKP.why_us)) {
+                html += `
+                    <div style="margin-bottom: 40px;">
+                        <h3 style="color: #2563eb; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">Почему мы</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            ${aiKP.why_us.map(reason => `<li style="margin-bottom: 10px; padding-left: 25px; position: relative;"><span style="position: absolute; left: 0; color: #2563eb; font-size: 18px;">✓</span>${reason}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            if (aiKP.guarantee) {
+                html += `
+                    <div style="margin-bottom: 40px; background: #f0f9ff; padding: 20px; border-radius: 8px; border-left: 4px solid #2563eb;">
+                        <strong style="color: #2563eb;">Гарантии:</strong>
+                        <div style="margin-top: 10px; color: #555;">${aiKP.guarantee}</div>
+                    </div>
+                `;
+            }
         } else {
             // Manual/Simple Content
             html += `
@@ -549,39 +582,47 @@ function generateKPHTML(type, data) {
                     <h3 style="color: #2563eb; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">Этапы работ</h3>
             `;
 
-            aiKP.stages.forEach(stage => {
-                html += `
-                    <div style="margin-bottom: 30px; background: #f8fafc; padding: 20px; border-radius: 8px;">
-                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                            <div style="font-size: 28px; font-weight: bold; color: #2563eb; margin-right: 15px;">${stage.number}</div>
-                            <h4 style="margin: 0; font-size: 18px;">${stage.title}</h4>
+            if (aiKP.stages && Array.isArray(aiKP.stages)) {
+                aiKP.stages.forEach(stage => {
+                    html += `
+                        <div style="margin-bottom: 30px; background: #f8fafc; padding: 20px; border-radius: 8px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                                <div style="font-size: 28px; font-weight: bold; color: #2563eb; margin-right: 15px;">${stage.number}</div>
+                                <h4 style="margin: 0; font-size: 18px;">${stage.title}</h4>
+                            </div>
+                            <div style="color: #555; font-size: 14px; margin-bottom: 15px;">${(stage.description || '').replace(/\n/g, '<br>')}</div>
+                            <div style="border-top: 1px solid #ddd; padding-top: 10px;">
+                                <strong style="font-size: 13px; color: #666;">Результаты:</strong>
+                                <ul style="margin: 5px 0 0 20px; padding: 0;">
+                                    ${(stage.deliverables || []).map(d => `<li style="font-size: 13px; color: #555;">${d}</li>`).join('')}
+                                </ul>
+                            </div>
                         </div>
-                        <div style="color: #555; font-size: 14px; margin-bottom: 15px;">${stage.description.replace(/\n/g, '<br>')}</div>
-                        <div style="border-top: 1px solid #ddd; padding-top: 10px;">
-                            <strong style="font-size: 13px; color: #666;">Результаты:</strong>
-                            <ul style="margin: 5px 0 0 20px; padding: 0;">
-                                ${stage.deliverables.map(d => `<li style="font-size: 13px; color: #555;">${d}</li>`).join('')}
-                            </ul>
-                        </div>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            }
 
             html += `</div>`;
 
-            html += `
-                <div style="margin-bottom: 40px;">
-                    <h3 style="color: #2563eb; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">Почему мы</h3>
-                    <ul style="list-style: none; padding: 0;">
-                        ${aiKP.why_us.map(reason => `<li style="margin-bottom: 10px; padding-left: 25px; position: relative;"><span style="position: absolute; left: 0; color: #2563eb; font-size: 18px;">✓</span>${reason}</li>`).join('')}
-                    </ul>
-                </div>
-                
-                <div style="margin-bottom: 40px; background: #f0f9ff; padding: 20px; border-radius: 8px; border-left: 4px solid #2563eb;">
-                    <strong style="color: #2563eb;">Гарантии:</strong>
-                    <div style="margin-top: 10px; color: #555;">${aiKP.guarantee}</div>
-                </div>
-            `;
+            if (aiKP.why_us && Array.isArray(aiKP.why_us)) {
+                html += `
+                    <div style="margin-bottom: 40px;">
+                        <h3 style="color: #2563eb; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">Почему мы</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            ${aiKP.why_us.map(reason => `<li style="margin-bottom: 10px; padding-left: 25px; position: relative;"><span style="position: absolute; left: 0; color: #2563eb; font-size: 18px;">✓</span>${reason}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            if (aiKP.guarantee) {
+                html += `
+                    <div style="margin-bottom: 40px; background: #f0f9ff; padding: 20px; border-radius: 8px; border-left: 4px solid #2563eb;">
+                        <strong style="color: #2563eb;">Гарантии:</strong>
+                        <div style="margin-top: 10px; color: #555;">${aiKP.guarantee}</div>
+                    </div>
+                `;
+            }
         } else {
             html += `
                 <div style="margin-bottom: 30px;">
@@ -603,25 +644,37 @@ function generateKPHTML(type, data) {
                 
                 <div style="margin-bottom: 30px;">
                     <h3 style="color: #2563eb;">Что входит в работу:</h3>
-                    <p style="color: #555;">${aiKP.what_included}</p>
-                </div>
-                
-                <div style="margin-bottom: 30px;">
-                    <h3 style="color: #2563eb;">Что вы получаете:</h3>
-                    <ul style="list-style: none; padding: 0;">
-                        ${aiKP.results.map(r => `<li style="margin-bottom: 10px; padding-left: 25px; position: relative;"><span style="position: absolute; left: 0; color: #2563eb;">✓</span>${r}</li>`).join('')}
-                    </ul>
-                </div>
-                
-                <div style="margin-bottom: 30px;">
-                    <h3 style="color: #2563eb;">Сроки:</h3>
-                    <p style="color: #555;">${aiKP.timeline}</p>
-                </div>
-                
-                <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; margin-bottom: 30px;">
-                    <strong>Гарантии:</strong> ${aiKP.guarantee}
+                    <p style="color: #555;">${aiKP.what_included || ''}</p>
                 </div>
             `;
+
+            if (aiKP.results && Array.isArray(aiKP.results)) {
+                html += `
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #2563eb;">Что вы получаете:</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            ${aiKP.results.map(r => `<li style="margin-bottom: 10px; padding-left: 25px; position: relative;"><span style="position: absolute; left: 0; color: #2563eb;">✓</span>${r}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            if (aiKP.timeline) {
+                html += `
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #2563eb;">Сроки:</h3>
+                        <p style="color: #555;">${aiKP.timeline}</p>
+                    </div>
+                `;
+            }
+
+            if (aiKP.guarantee) {
+                html += `
+                    <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; margin-bottom: 30px;">
+                        <strong>Гарантии:</strong> ${aiKP.guarantee}
+                    </div>
+                `;
+            }
         } else {
             html += `
                 <div style="margin-bottom: 30px;">
@@ -659,33 +712,67 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const type = urlParams.get('type');
 
-    if (window.location.pathname.includes('generator.html') && type) {
+    // Проверяем что мы на странице generator.html И есть параметр type
+    const isGeneratorPage = window.location.pathname.includes('generator.html') ||
+        window.location.pathname.includes('generator');
+
+    if (isGeneratorPage && type) {
+        const formContainer = document.getElementById('kpForm');
+        const previewContainer = document.getElementById('kpPreview');
+
+        if (!formContainer) {
+            console.error('[Init] Form container #kpForm not found');
+            return;
+        }
+
         FormHelper.buildForm(type, 'kpForm');
 
         // Preview update function
         window.updatePreview = () => {
             const data = FormHelper.getFormData('kpForm');
             const html = generateKPHTML(type, data);
-            document.getElementById('kpPreview').innerHTML = html;
+            if (previewContainer) {
+                previewContainer.innerHTML = html;
+            }
         };
 
         // Update preview on any input change
-        document.getElementById('kpForm').addEventListener('input', window.updatePreview);
+        formContainer.addEventListener('input', window.updatePreview);
 
         // Initial call
         window.updatePreview();
 
+        // Buttons - проверяем существование перед назначением обработчиков
+        const btnDownload = document.getElementById('btnDownload');
+        const btnPrint = document.getElementById('btnPrint');
+        const btnClear = document.getElementById('btnClear');
 
-        document.getElementById('btnPrint').onclick = () => {
-            Exporter.print('kpPreview');
-        };
+        if (btnDownload) {
+            btnDownload.onclick = () => {
+                Exporter.toPDF('kpPreview', `KP_${type}_${Date.now()}.pdf`);
+            };
+        } else {
+            console.warn('[Init] Button #btnDownload not found');
+        }
 
-        document.getElementById('btnClear').onclick = () => {
-            if (confirm('Очистить форму и AI данные?')) {
-                localStorage.removeItem(`kp_data_${type}`);
-                AIHelper.currentAIKP = null;
-                location.reload();
-            }
-        };
+        if (btnPrint) {
+            btnPrint.onclick = () => {
+                Exporter.print('kpPreview');
+            };
+        } else {
+            console.warn('[Init] Button #btnPrint not found');
+        }
+
+        if (btnClear) {
+            btnClear.onclick = () => {
+                if (confirm('Очистить форму и AI данные?')) {
+                    localStorage.removeItem(`kp_data_${type}`);
+                    AIHelper.currentAIKP = null;
+                    location.reload();
+                }
+            };
+        } else {
+            console.warn('[Init] Button #btnClear not found');
+        }
     }
 });
