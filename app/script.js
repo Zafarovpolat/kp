@@ -675,10 +675,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initial call
         window.updatePreview();
 
-        // Buttons
-        document.getElementById('btnDownload').onclick = () => {
-            Exporter.toPDF('kpPreview', `KP_${type}_${Date.now()}.pdf`);
-        };
 
         document.getElementById('btnPrint').onclick = () => {
             Exporter.print('kpPreview');
