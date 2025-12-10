@@ -757,9 +757,17 @@ const UI = {
     handleDownload() {
         const element = this.elements.preview;
 
-        // Улучшенные настройки PDF
+        // Получаем реальную высоту контента
+        const contentHeight = element.scrollHeight;
+        const contentWidth = element.scrollWidth;
+
+        // Конвертируем пиксели в мм (примерно 3.78 px = 1mm при 96dpi)
+        const pxToMm = 0.264583;
+        const pageWidth = 210; // A4 ширина в мм
+        const pageHeight = Math.ceil(contentHeight * pxToMm) + 30; // Высота контента + отступы
+
         const opt = {
-            margin: [15, 15, 15, 15], // top, left, bottom, right в мм
+            margin: [10, 10, 10, 10], // отступы в мм
             filename: `KP_RUSO_${Date.now()}.pdf`,
             image: {
                 type: 'jpeg',
@@ -769,18 +777,15 @@ const UI = {
                 scale: 2,
                 useCORS: true,
                 letterRendering: true,
-                logging: false
+                scrollY: 0,
+                scrollX: 0,
+                windowWidth: element.scrollWidth,
+                windowHeight: element.scrollHeight
             },
             jsPDF: {
                 unit: 'mm',
-                format: 'a4',
+                format: [pageWidth, pageHeight], // Кастомный размер — одна длинная страница
                 orientation: 'portrait'
-            },
-            pagebreak: {
-                mode: ['avoid-all', 'css', 'legacy'],
-                before: '.page-break-before',
-                after: '.page-break-after',
-                avoid: ['.section', '.stage', '.total-box', '.cta-section', '.why-item', '.highlight-box', 'table', 'tr']
             }
         };
 
@@ -800,7 +805,7 @@ const UI = {
                 console.error('PDF Error:', err);
                 this.elements.btnDownload.innerHTML = btnText;
                 this.elements.btnDownload.disabled = false;
-                alert('Ошибка создания PDF. Попробуйте использовать печать (Ctrl+P)');
+                alert('Ошибка создания PDF');
             });
     },
 
