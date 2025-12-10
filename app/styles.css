@@ -401,11 +401,9 @@ body {
 /* Preview Paper */
 .preview-paper {
     width: 210mm;
-    min-height: 297mm;
     background: white;
     box-shadow: 0 4px 40px rgba(0, 0, 0, 0.5);
     color: #1a1a1a;
-    overflow: hidden;
 }
 
 .preview-placeholder {
