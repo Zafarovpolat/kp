@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUSO | Генератор КП</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <span class="logo-text">RUSO</span>
+                <span class="logo-dot"></span>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Генератор КП</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span>История</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Настройки</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="agency-badge">
+                    <span>15+ лет</span>
+                    <span class="separator">•</span>
+                    <span>250+ проектов</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <div class="page-title">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    Создание коммерческого предложения
+                </div>
+                <div class="actions">
+                    <a href="https://ruso.ru" target="_blank" class="btn btn-ghost btn-sm">
+                        <i class="fa-solid fa-external-link"></i> ruso.ru
+                    </a>
+                </div>
+            </div>
+
+            <div class="generator-layout">
+                <!-- Left Panel: Form -->
+                <div class="form-panel">
+                    <div class="panel-header">
+                        <h2>Запрос клиента</h2>
+                        <p>Вставьте текст заявки — AI проанализирует и создаст КП</p>
+                    </div>
+
+                    <form id="kpForm">
+                        <!-- Client Request -->
+                        <div class="form-group">
+                            <label class="form-label required">Текст запроса от клиента</label>
+                            <textarea id="client-request" class="form-textarea" rows="8"
+                                placeholder="Вставьте сюда текст заявки клиента, например:
+
+«Требуется провести аудит сайта, исправить ошибки, сделать редизайн. Сайт: example.com. Также нужно SEO-продвижение...»"></textarea>
+                            <div class="form-hint">AI определит тип проекта, этапы работ и создаст детальное КП</div>
+                        </div>
+
+                        <!-- URL (optional) -->
+                        <div class="form-group">
+                            <label class="form-label">Ссылка на сайт/проект (если есть)</label>
+                            <input type="url" id="project-url" class="form-input" placeholder="https://example.com">
+                        </div>
+
+                        <div class="form-divider"></div>
+
+                        <!-- Price -->
+                        <div class="form-group">
+                            <label class="form-label required">Стоимость проекта (₽)</label>
+                            <input type="text" id="price-total" class="form-input form-input-large"
+                                placeholder="150 000" value="150 000">
+                        </div>
+
+                        <!-- Manager Info -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Менеджер</label>
+                                <input type="text" id="manager-name" class="form-input" placeholder="Имя"
+                                    value="Александр">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Телефон</label>
+                                <input type="tel" id="manager-phone" class="form-input" placeholder="+7 (985) 817-65-00"
+                                    value="+7 (985) 817-65-00">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="manager-email" class="form-input" placeholder="hello@ruso.ru"
+                                value="hello@ruso.ru">
+                        </div>
+
+                        <!-- Generate Button -->
+                        <button type="button" id="btnGenerate" class="btn btn-generate">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>Сгенерировать КП</span>
+                        </button>
+
+                        <!-- Secondary Actions -->
+                        <div class="form-actions-row">
+                            <button type="button" id="btnClear" class="btn btn-ghost">
+                                <i class="fa-solid fa-trash"></i> Очистить
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right Panel: Preview -->
+                <div class="preview-panel">
+                    <div class="toolbar">
+                        <button type="button" id="btnDownload" class="btn btn-primary" disabled>
+                            <i class="fa-solid fa-download"></i> Скачать PDF
+                        </button>
+                        <button type="button" id="btnPrint" class="btn btn-secondary" disabled>
+                            <i class="fa-solid fa-print"></i> Печать
+                        </button>
+                    </div>
+
+                    <div id="kpPreview" class="preview-paper">
+                        <div class="preview-placeholder">
+                            <div class="placeholder-icon">
+                                <i class="fa-solid fa-file-invoice"></i>
+                            </div>
+                            <h3>КП появится здесь</h3>
+                            <p>Вставьте запрос клиента и нажмите «Сгенерировать КП»</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div class="loading-text">
+                <h3>AI анализирует запрос...</h3>
+                <p>Создаём детальное коммерческое предложение</p>
+            </div>
+            <div class="loading-steps">
+                <div class="step" id="step1"><i class="fa-solid fa-circle-notch fa-spin"></i> Анализ требований</div>
+                <div class="step" id="step2"><i class="fa-solid fa-circle"></i> Формирование этапов</div>
+                <div class="step" id="step3"><i class="fa-solid fa-circle"></i> Генерация КП</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
