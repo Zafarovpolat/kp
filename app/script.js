@@ -755,68 +755,47 @@ const UI = {
     },
 
     handleDownload() {
-        const element = this.elements.preview;
+        const content = this.elements.preview.innerHTML;
+        const win = window.open('', '_blank');
 
-        // Создаём временный контейнер для PDF
-        const pdfContainer = document.createElement('div');
-        pdfContainer.style.cssText = `
-        position: absolute;
-        left: -9999px;
-        top: 0;
-        width: 794px;
-        background: white;
-    `;
+        win.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+    <title>КП RUSO</title>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+${content}
+<script>
+    window.onload = function() {
+        setTimeout(function() {
+            window.print();
+        }, 500);
+    };
+</script>
+</body>
+</html>
+    `);
 
-        // Клонируем содержимое
-        pdfContainer.innerHTML = element.innerHTML;
-        document.body.appendChild(pdfContainer);
-
-        // Ждём рендеринга
-        setTimeout(() => {
-            const contentHeight = pdfContainer.scrollHeight;
-
-            // A4: 210 x 297 мм, но делаем одну длинную страницу
-            const pageWidthMm = 210;
-            const pageWidthPx = 794; // 210mm при 96dpi
-            const ratio = pageWidthMm / pageWidthPx;
-            const pageHeightMm = Math.ceil(contentHeight * ratio) + 20;
-
-            const opt = {
-                margin: [10, 0, 10, 0], // top, left, bottom, right
-                filename: `KP_RUSO_${Date.now()}.pdf`,
-                image: { type: 'jpeg', quality: 0.95 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false
-                },
-                jsPDF: {
-                    unit: 'mm',
-                    format: [pageWidthMm, pageHeightMm],
-                    orientation: 'portrait'
-                }
-            };
-
-            const btnText = this.elements.btnDownload.innerHTML;
-            this.elements.btnDownload.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Создание...';
-            this.elements.btnDownload.disabled = true;
-
-            html2pdf()
-                .set(opt)
-                .from(pdfContainer)
-                .save()
-                .then(() => {
-                    document.body.removeChild(pdfContainer);
-                    this.elements.btnDownload.innerHTML = btnText;
-                    this.elements.btnDownload.disabled = false;
-                })
-                .catch((err) => {
-                    console.error('PDF Error:', err);
-                    document.body.removeChild(pdfContainer);
-                    this.elements.btnDownload.innerHTML = btnText;
-                    this.elements.btnDownload.disabled = false;
-                });
-        }, 100);
+        win.document.close();
     },
 
     handlePrint() {
