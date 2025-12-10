@@ -481,6 +481,12 @@ body {
     }
 }
 
+@page {
+    size: 210mm auto;
+    /* Ширина A4, высота АВТОМАТИЧЕСКАЯ */
+    margin: 0;
+}
+
 .loading-text h3 {
     font-size: 1.25rem;
     margin-bottom: 0.5rem;
