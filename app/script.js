@@ -757,40 +757,35 @@ const UI = {
     handleDownload() {
         const element = this.elements.preview;
 
-        // Получаем реальную высоту контента
+        // Фиксированная ширина A4 и динамическая высота
+        const a4Width = 210; // мм
+        const contentWidth = 800; // пикселей - фиксированная ширина контента
         const contentHeight = element.scrollHeight;
-        const contentWidth = element.scrollWidth;
 
-        // Конвертируем пиксели в мм (примерно 3.78 px = 1mm при 96dpi)
-        const pxToMm = 0.264583;
-        const pageWidth = 210; // A4 ширина в мм
-        const pageHeight = Math.ceil(contentHeight * pxToMm) + 30; // Высота контента + отступы
+        // Соотношение для конвертации px -> mm
+        const ratio = a4Width / contentWidth;
+        const pageHeight = Math.ceil(contentHeight * ratio) + 30;
 
         const opt = {
-            margin: [10, 10, 10, 10], // отступы в мм
+            margin: 0,
             filename: `KP_RUSO_${Date.now()}.pdf`,
-            image: {
-                type: 'jpeg',
-                quality: 0.98
-            },
+            image: { type: 'jpeg', quality: 0.98 },
             html2canvas: {
                 scale: 2,
                 useCORS: true,
-                letterRendering: true,
-                scrollY: 0,
-                scrollX: 0,
-                windowWidth: element.scrollWidth,
-                windowHeight: element.scrollHeight
+                logging: false,
+                width: contentWidth,
+                windowWidth: contentWidth
             },
             jsPDF: {
                 unit: 'mm',
-                format: [pageWidth, pageHeight], // Кастомный размер — одна длинная страница
+                format: [a4Width, pageHeight],
                 orientation: 'portrait'
             }
         };
 
         const btnText = this.elements.btnDownload.innerHTML;
-        this.elements.btnDownload.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Создание PDF...';
+        this.elements.btnDownload.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Создание...';
         this.elements.btnDownload.disabled = true;
 
         html2pdf()
@@ -805,7 +800,6 @@ const UI = {
                 console.error('PDF Error:', err);
                 this.elements.btnDownload.innerHTML = btnText;
                 this.elements.btnDownload.disabled = false;
-                alert('Ошибка создания PDF');
             });
     },
 
