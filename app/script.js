@@ -757,50 +757,66 @@ const UI = {
     handleDownload() {
         const element = this.elements.preview;
 
-        // Фиксированная ширина A4 и динамическая высота
-        const a4Width = 210; // мм
-        const contentWidth = 800; // пикселей - фиксированная ширина контента
-        const contentHeight = element.scrollHeight;
+        // Создаём временный контейнер для PDF
+        const pdfContainer = document.createElement('div');
+        pdfContainer.style.cssText = `
+        position: absolute;
+        left: -9999px;
+        top: 0;
+        width: 794px;
+        background: white;
+    `;
 
-        // Соотношение для конвертации px -> mm
-        const ratio = a4Width / contentWidth;
-        const pageHeight = Math.ceil(contentHeight * ratio) + 30;
+        // Клонируем содержимое
+        pdfContainer.innerHTML = element.innerHTML;
+        document.body.appendChild(pdfContainer);
 
-        const opt = {
-            margin: 0,
-            filename: `KP_RUSO_${Date.now()}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                width: contentWidth,
-                windowWidth: contentWidth
-            },
-            jsPDF: {
-                unit: 'mm',
-                format: [a4Width, pageHeight],
-                orientation: 'portrait'
-            }
-        };
+        // Ждём рендеринга
+        setTimeout(() => {
+            const contentHeight = pdfContainer.scrollHeight;
 
-        const btnText = this.elements.btnDownload.innerHTML;
-        this.elements.btnDownload.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Создание...';
-        this.elements.btnDownload.disabled = true;
+            // A4: 210 x 297 мм, но делаем одну длинную страницу
+            const pageWidthMm = 210;
+            const pageWidthPx = 794; // 210mm при 96dpi
+            const ratio = pageWidthMm / pageWidthPx;
+            const pageHeightMm = Math.ceil(contentHeight * ratio) + 20;
 
-        html2pdf()
-            .set(opt)
-            .from(element)
-            .save()
-            .then(() => {
-                this.elements.btnDownload.innerHTML = btnText;
-                this.elements.btnDownload.disabled = false;
-            })
-            .catch((err) => {
-                console.error('PDF Error:', err);
-                this.elements.btnDownload.innerHTML = btnText;
-                this.elements.btnDownload.disabled = false;
-            });
+            const opt = {
+                margin: [10, 0, 10, 0], // top, left, bottom, right
+                filename: `KP_RUSO_${Date.now()}.pdf`,
+                image: { type: 'jpeg', quality: 0.95 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: [pageWidthMm, pageHeightMm],
+                    orientation: 'portrait'
+                }
+            };
+
+            const btnText = this.elements.btnDownload.innerHTML;
+            this.elements.btnDownload.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Создание...';
+            this.elements.btnDownload.disabled = true;
+
+            html2pdf()
+                .set(opt)
+                .from(pdfContainer)
+                .save()
+                .then(() => {
+                    document.body.removeChild(pdfContainer);
+                    this.elements.btnDownload.innerHTML = btnText;
+                    this.elements.btnDownload.disabled = false;
+                })
+                .catch((err) => {
+                    console.error('PDF Error:', err);
+                    document.body.removeChild(pdfContainer);
+                    this.elements.btnDownload.innerHTML = btnText;
+                    this.elements.btnDownload.disabled = false;
+                });
+        }, 100);
     },
 
     handlePrint() {
